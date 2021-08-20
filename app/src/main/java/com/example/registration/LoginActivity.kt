@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
                     email= email,
                     password= password
                 )
-                var retrofit= ApiClient.buildService(ApiInterface::class.java)
+                var retrofit= ApiClient.buildApiClient(ApiInterface::class.java)
                 var request= retrofit.loginStudent(lrgRequest)
                 request.enqueue(object : Callback<RegistrationResponse?> {
                     override fun onResponse(

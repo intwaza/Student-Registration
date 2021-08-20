@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setupSpinner() {
-        var nationalities= arrayOf("select Nationality","Kenyan","Rwandan","South Sudanese","Ugandan")
+        var nationalities= arrayOf("select Nationality","KENYAN","RWANDAN","SOUTH SUDANESE","UGANDAN")
         var nationalityadapter = ArrayAdapter(baseContext,android.R.layout.simple_spinner_item,nationalities)
         nationalityadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spNationality.adapter = nationalityadapter
@@ -86,26 +86,28 @@ class MainActivity : AppCompatActivity() {
                     password = password
                 )
 
-                var retrofit= ApiClient.buildService(ApiInterface::class.java)
+                var retrofit= ApiClient.buildApiClient(ApiInterface::class.java)
                 var request= retrofit.registerStudent(lrgRequest)
-                request.enqueue(object : Callback<RegistrationResponse> {
+                request.enqueue(object : Callback<RegistrationResponse?> {
                     override fun onResponse(
-                        call: Call<RegistrationResponse>,
-                        response: Response<RegistrationResponse>
+                        call: Call<RegistrationResponse?>,
+                        response: Response<RegistrationResponse?>
                     ) {
                         binding.pbRegistration.visibility=View.GONE
                         if (response.isSuccessful){
-                            Toast.makeText(baseContext,"Registration successfully", Toast.LENGTH_LONG).show()
+                            Toast.makeText(baseContext,"Registration successful", Toast.LENGTH_LONG).show()
                         }
                         else{
                             Toast.makeText(baseContext, response.errorBody()?.string(), Toast.LENGTH_LONG).show()
                         }
                     }
 
-                    override fun onFailure(call: Call<RegistrationResponse>, t: Throwable) {
+                    override fun onFailure(call: Call<RegistrationResponse?>, t: Throwable) {
                         binding.pbRegistration.visibility=View.GONE
                         Toast.makeText(baseContext, t.message, Toast.LENGTH_LONG).show()
                     }
+
+
                 })
             }
         }

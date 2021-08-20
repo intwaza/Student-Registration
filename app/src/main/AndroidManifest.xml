@@ -15,7 +15,6 @@
         <activity
             android:name=".LoginActivity"
             android:exported="true" />
-        <activity android:name=".ui.SchoolActivity" />
         <activity android:name=".CoursesActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
