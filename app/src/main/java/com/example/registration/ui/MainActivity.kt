@@ -1,4 +1,4 @@
-package com.example.registration
+package com.example.registration.ui
 
 
 import android.content.Intent
@@ -6,17 +6,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.*
-import com.example.registration.api.ApiClient
-import com.example.registration.api.ApiInterface
+import androidx.activity.viewModels
 import com.example.registration.databinding.ActivityMainBinding
 import com.example.registration.models.RegistrationRequest
-import com.example.registration.models.RegistrationResponse
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.registration.viewModel.UserViewModel
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
+    val userViewModel: UserViewModel by viewModels() //factory design patern
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +22,21 @@ class MainActivity : AppCompatActivity() {
         setupSpinner()
         clickRegister()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        userViewModel.registrationLiveData.observe(this,{regResponse->
+            if (regResponse.studentId.isNullOrEmpty()){
+                Toast.makeText(baseContext,"Registration successful", Toast.LENGTH_LONG).show()
+
+            }
+            binding.pbRegistration.visibility= View.GONE
+        })
+        userViewModel.errorLiveData.observe(this,{error->
+            Toast.makeText(baseContext,error,Toast.LENGTH_LONG).show()
+            binding.pbRegistration.visibility= View.GONE
+        })
     }
 
     fun setupSpinner() {
@@ -77,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 
             if (!error){
                 binding.pbRegistration.visibility=View.VISIBLE
-                var lrgRequest= RegistrationRequest(
+                var regRequest= RegistrationRequest(
                     name = name,
                     PhoneNumber = phoneNumber,
                     email = email,
@@ -85,34 +97,11 @@ class MainActivity : AppCompatActivity() {
                     nationality = nationality,
                     password = password
                 )
-
-                var retrofit= ApiClient.buildApiClient(ApiInterface::class.java)
-                var request= retrofit.registerStudent(lrgRequest)
-                request.enqueue(object : Callback<RegistrationResponse?> {
-                    override fun onResponse(
-                        call: Call<RegistrationResponse?>,
-                        response: Response<RegistrationResponse?>
-                    ) {
-                        binding.pbRegistration.visibility=View.GONE
-                        if (response.isSuccessful){
-                            Toast.makeText(baseContext,"Registration successful", Toast.LENGTH_LONG).show()
-                        }
-                        else{
-                            Toast.makeText(baseContext, response.errorBody()?.string(), Toast.LENGTH_LONG).show()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<RegistrationResponse?>, t: Throwable) {
-                        binding.pbRegistration.visibility=View.GONE
-                        Toast.makeText(baseContext, t.message, Toast.LENGTH_LONG).show()
-                    }
-
-
-                })
+                userViewModel.registerStudent(regRequest)
             }
         }
     }
 }
-//data class Student(var name: String, var dob: String, var idNo:String, var nationality:String, var phoneNumber:String, var email: String){
-//
-//}
+data class Student(var name: String, var dob: String, var idNo:String, var nationality:String, var phoneNumber:String, var email: String){
+
+}
