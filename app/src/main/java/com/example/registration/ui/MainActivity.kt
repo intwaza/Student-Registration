@@ -1,12 +1,15 @@
 package com.example.registration.ui
 
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
+import com.example.registration.Constants
 import com.example.registration.databinding.ActivityMainBinding
 import com.example.registration.models.RegistrationRequest
 import com.example.registration.viewModel.UserViewModel
@@ -14,6 +17,7 @@ import com.example.registration.viewModel.UserViewModel
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     val userViewModel: UserViewModel by viewModels() //factory design patern
+    lateinit var sharedPrefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +25,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setupSpinner()
         clickRegister()
+        sharedPrefs= getSharedPreferences(Constants.REGISTRATION_PREFS, Context.MODE_PRIVATE)
+        redirectUser()
 
     }
 
@@ -101,6 +107,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    fun redirectUser(){
+        var accessToken= sharedPrefs.getString(Constants.ACCESS_TOKEN, Constants.EMPTY_STRING)!!
+        if (accessToken.isNotEmpty() && accessToken.isNotBlank()){
+            startActivity(Intent(this, CoursesActivity::class.java))
+        }
+        else{
+            startActivity(Intent(this, LoginActivity::class.java))
+        }
+    }
+
 }
 data class Student(var name: String, var dob: String, var idNo:String, var nationality:String, var phoneNumber:String, var email: String){
 
